@@ -1,9 +1,11 @@
+
 #ifndef NETWORK_MANAGER_H
 #define NETWORK_MANAGER_H
 
 #include <QNEthernet.h>
 #include <QNDNSClient.h>
 #include "StorageManager.h"
+#include <TimeLib.h>
 
 using namespace qindesign::network;
 
@@ -21,14 +23,24 @@ uint8_t macAddressNoUSBHeader[6] = {0x04, 0xe9, 0xe5, 0x11, 0x22, 0x7c};
 uint8_t* serverMacAddress = macAddressNoUSBHeader;
 uint8_t* clientMacAddress = macAddressUSBHeader;
 
+struct JacktripDefaultHeader{
+  uint64_t TimeStamp;
+  uint16_t SeqNumber;
+  uint16_t BufferSize;
+  uint8_t SamplingRate;
+  uint8_t BitResolution;
+  uint8_t NumIncomingChannelsFromNet;
+  uint8_t NumOutgoingChannelsFromNet;
+};
+
 class NetworkManager{
 public:
-  void Setup(){
+  void Setup(bool useJacktripHeader = false){
+    this->useJacktripHeader = useJacktripHeader;
     // Print the MAC address
 
     Ethernet.macAddress(mac);
-    Serial.printf("MAC = %02x:%02x:%02x:%02x:%02x:%02x\n",
-                  mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+    Serial.printf("MAC = %02x:%02x:%02x:%02x:%02x:%02x\n", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
     
     // Initialize Ethernet, in this case with DHCP
     Serial.println("Starting Ethernet with DHCP...");
@@ -115,15 +127,30 @@ public:
     byte audioPacket[512];
     memcpy(audioPacket, audioBufferLeft, 256);
     memcpy(&audioPacket[256], audioBufferRight, 256);
-    return udp.send(remoteNodeIP,  kAudioPort, audioPacket, 512);
+
+    if (useJacktripHeader == true){
+      jacktripDefaultHeader.TimeStamp = (uint64_t(now()) * 1000000) + (micros()); // this is microseconds since the program started so INCORRECT
+      byte audioPacketWithHeader[528];
+      // copy the header to the first 16 bytes
+      memcpy(&audioPacketWithHeader[0], &jacktripDefaultHeader, sizeof(JacktripDefaultHeader));
+      // copy the remaining audio data to the rest of the byte array
+      memcpy(&audioPacketWithHeader[16], audioPacket, 512);
+      // increase the sequence for the next header
+      jacktripDefaultHeader.SeqNumber++;
+      return udp.send(remoteNodeIP,  kAudioPort, audioPacketWithHeader, 528);
+    }
+    else {
+      return udp.send(remoteNodeIP,  kAudioPort, audioPacket, 512);
+    }
   }
 
   bool receiveAudioBuffers(byte outputAudioBufferLeft[256], byte outputAudioBufferRight[256]){
     uint16_t size = udp.parsePacket();
     if (0 < size && size <= sizeof(buf)) {
       udp.read(buf, size);
-      memcpy(outputAudioBufferLeft, buf, 256);
-      memcpy(outputAudioBufferRight, &buf[256], 256);
+      int audioDataOffset = useJacktripHeader ? 16 : 0;
+      memcpy(outputAudioBufferLeft, &buf[audioDataOffset], 256);
+      memcpy(outputAudioBufferRight, &buf[256+audioDataOffset], 256);
       return true;
     }
     return false;
@@ -134,6 +161,16 @@ private:
   bool isStaticIP = false;
   IPAddress remoteNodeIP;
   uint8_t mac[6];
+  bool useJacktripHeader = false;
+  JacktripDefaultHeader jacktripDefaultHeader = {
+    0,    //uint64_t TimeStamp;
+    0,    //uint16_t SeqNumber;
+    128,  //uint16_t BufferSize;
+    2,    //uint8_t SamplingRate;
+    16,   //uint8_t BitResolution;
+    2,    //uint8_t NumIncomingChannelsFromNet;
+    0     //uint8_t NumOutgoingChannelsFromNet;
+  };
   
   bool isServer(){
     for (int i=0; i<6; i++){

@@ -18,7 +18,6 @@ void setup() {
   displayManager.println("Setting up Audio...");
   audioManager.Setup();
   displayManager.println("Done!");
-  
 }
 
 void loop() {
