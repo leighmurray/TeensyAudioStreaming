@@ -1,16 +1,24 @@
 #include "NetworkManager.h"
 #include "AudioManager.h"
+#include "DisplayManager.h"
 
 NetworkManager networkManager;
 AudioManager audioManager;
+DisplayManager displayManager;
 
 void handleRemoteAudio();
 void handleLocalAudio();
 
 void setup() {
   Serial.begin(115200);
+  displayManager.Setup();
+  displayManager.println("Setting up Network...");
   networkManager.Setup();
+  displayManager.println("Done!");
+  displayManager.println("Setting up Audio...");
   audioManager.Setup();
+  displayManager.println("Done!");
+  
 }
 
 void loop() {

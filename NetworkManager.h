@@ -15,20 +15,17 @@ EthernetUDP udp;
 uint8_t buf[Ethernet.mtu() - 20 - 8];  // Maximum UDP payload size
                                        // 20-byte IP, 8-byte UDP header
 
-//IPAddress staticIP{192, 168, 1, 1};
-//IPAddress subnetMask{255, 255, 255, 0};
-//IPAddress gateway{192, 168, 1, 2};
-
 uint8_t macAddressUSBHeader[6] = {0x04, 0xe9, 0xe5, 0x0c, 0xec, 0x21};
 uint8_t macAddressNoUSBHeader[6] = {0x04, 0xe9, 0xe5, 0x11, 0x22, 0x7c};
-uint8_t* serverMacAddress = macAddressUSBHeader;
-uint8_t* clientMacAddress = macAddressNoUSBHeader;
+
+uint8_t* serverMacAddress = macAddressNoUSBHeader;
+uint8_t* clientMacAddress = macAddressUSBHeader;
 
 class NetworkManager{
 public:
   void Setup(){
     // Print the MAC address
-    uint8_t mac[6];
+
     Ethernet.macAddress(mac);
     Serial.printf("MAC = %02x:%02x:%02x:%02x:%02x:%02x\n",
                   mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
@@ -40,24 +37,17 @@ public:
       return;
     }
     if (!Ethernet.waitForLocalIP(kDHCPTimeout)) {
-      Serial.println("Failed to get IP address from DHCP");
-      return;
+      Serial.println("Failed to get IP address from DHCP.");
+      SetupStaticIP();
     }
-  
-    IPAddress ip = Ethernet.localIP();
-    Serial.printf("    Local IP     = %u.%u.%u.%u\n", ip[0], ip[1], ip[2], ip[3]);
-    ip = Ethernet.subnetMask();
-    Serial.printf("    Subnet mask  = %u.%u.%u.%u\n", ip[0], ip[1], ip[2], ip[3]);
-    ip = Ethernet.broadcastIP();
-    Serial.printf("    Broadcast IP = %u.%u.%u.%u\n", ip[0], ip[1], ip[2], ip[3]);
-    ip = Ethernet.gatewayIP();
-    Serial.printf("    Gateway      = %u.%u.%u.%u\n", ip[0], ip[1], ip[2], ip[3]);
-    ip = Ethernet.dnsServerIP();
-    Serial.printf("    DNS          = %u.%u.%u.%u\n", ip[0], ip[1], ip[2], ip[3]);
 
-
-    // Listen on port and start an mDNS service
+    PrintIPData();
+    
+    // Listen on port
     udp.begin(kAudioPort);
+
+
+    // start an mDNS service
     Serial.println("Starting mDNS...");
     if (!MDNS.begin(kServiceName)) {
       Serial.println("ERROR: Starting mDNS.");
@@ -141,8 +131,47 @@ public:
 
 
 private:
+  bool isStaticIP = false;
   IPAddress remoteNodeIP;
+  uint8_t mac[6];
   
+  bool isServer(){
+    for (int i=0; i<6; i++){
+      if (serverMacAddress[i] != mac[i]){
+        return false;
+      }
+    }
+    return true;
+  }
+
+  void PrintIPData(){
+    IPAddress ip = Ethernet.localIP();
+    Serial.printf("    Local IP     = %u.%u.%u.%u\n", ip[0], ip[1], ip[2], ip[3]);
+    ip = Ethernet.subnetMask();
+    Serial.printf("    Subnet mask  = %u.%u.%u.%u\n", ip[0], ip[1], ip[2], ip[3]);
+    ip = Ethernet.broadcastIP();
+    Serial.printf("    Broadcast IP = %u.%u.%u.%u\n", ip[0], ip[1], ip[2], ip[3]);
+    ip = Ethernet.gatewayIP();
+    Serial.printf("    Gateway      = %u.%u.%u.%u\n", ip[0], ip[1], ip[2], ip[3]);
+    ip = Ethernet.dnsServerIP();
+    Serial.printf("    DNS          = %u.%u.%u.%u\n", ip[0], ip[1], ip[2], ip[3]);
+  }
+  
+  void SetupStaticIP(){
+    Serial.println("Setting up static IP");
+    IPAddress subnetMask{255, 255, 255, 0};
+    IPAddress serverIP{192, 168, 1, 1};
+    IPAddress clientIP{192, 168, 1, 2};
+    
+    if (isServer()){
+      Serial.println("We're the server");
+      Ethernet.begin(serverIP, subnetMask, clientIP);
+    } else {
+      Serial.println("We're the client");
+      Ethernet.begin(clientIP, subnetMask, serverIP);
+    }
+    isStaticIP = true;
+  }
 };
 
 #endif
