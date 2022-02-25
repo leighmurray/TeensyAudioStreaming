@@ -13,7 +13,7 @@ void setup() {
   Serial.begin(115200);
   displayManager.Setup();
   displayManager.println("Setting up Network...");
-  networkManager.Setup();
+  networkManager.Setup(true);
   displayManager.println("Done!");
   displayManager.println("Setting up Audio...");
   audioManager.Setup();
