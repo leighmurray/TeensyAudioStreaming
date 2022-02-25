@@ -52,7 +52,7 @@ public:
     tft.fillScreen(ILI9341_BLACK);
   }
 
-  void println(char *text) {
+  void println(String text) {
     tft.println(text);
   }
 

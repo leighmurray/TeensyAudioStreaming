@@ -5,20 +5,21 @@
 
 class StorageManager{
 public:
-  static bool saveRemoteIPAddress(byte ip0, byte ip1, byte ip2,byte ip3){
-    EEPROM.write(0, ip0);
-    EEPROM.write(1, ip1);
-    EEPROM.write(2, ip2);
-    EEPROM.write(3, ip3);
+  static bool saveRemoteIPAddress(uint32_t ip){
+    uint8_t *ipSegment = (uint8_t *)(&ip);
+    for (int i=0; i<4; i++){
+      EEPROM.write(i, ipSegment[i]);
+    }
     return true;
   }
 
-  static bool getRemoteIPAddress(byte* ip0, byte* ip1, byte* ip2, byte* ip3){
-    *ip0 = EEPROM.read(0);
-    *ip1 = EEPROM.read(1);
-    *ip2 = EEPROM.read(2);
-    *ip3 = EEPROM.read(3);
-    return true;
+  static uint32_t getRemoteIPAddress(){
+    uint32_t ip;
+    uint8_t *ipSegment = (uint8_t *)(&ip);
+    for (int i=0; i<4; i++){
+      ipSegment[i] = EEPROM.read(i);
+    }
+    return ip;
   }
 };
 

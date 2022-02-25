@@ -80,12 +80,8 @@ public:
 
     // TODO: tidy this up please
     while (!initialised) {
-      byte savedIP0;
-      byte savedIP1;
-      byte savedIP2;
-      byte savedIP3;
-      StorageManager::getRemoteIPAddress(&savedIP0, &savedIP1, &savedIP2, &savedIP3);
-      Serial.printf("Please give me the remote IP address or press enter to attempt %u.%u.%u.%u:\n", savedIP0, savedIP1, savedIP2, savedIP3);
+      IPAddress savedIP(StorageManager::getRemoteIPAddress());
+      Serial.printf("Please give me the remote IP address or press enter to attempt %u.%u.%u.%u:\n", savedIP[0], savedIP[1], savedIP[2], savedIP[3]);
       uint8_t count = 10;
       Serial.print("Auto-reconnect in: ");
       while(!Serial.available() && count > 0){
@@ -93,7 +89,7 @@ public:
           remoteNodeIP = udp.remoteIP();
           Serial.print("Nevermind, we have incoming data from: ");
           Serial.println(remoteNodeIP);
-          StorageManager::saveRemoteIPAddress(remoteNodeIP[0], remoteNodeIP[1], remoteNodeIP[2], remoteNodeIP[3]);
+          StorageManager::saveRemoteIPAddress(uint32_t(remoteNodeIP));
           return;
         }
         Serial.printf("%u, ", count);
@@ -103,7 +99,7 @@ public:
       String ipString = Serial.readStringUntil('\n');
       if (!ipString.length()){
         Serial.print("Setting remote to: ");
-        remoteNodeIP = IPAddress(savedIP0, savedIP1, savedIP2, savedIP3);
+        remoteNodeIP = savedIP;
         Serial.println(remoteNodeIP);
         initialised = true;
         // returning so that we dont "waste" a write to the EEPROM because it's limited.
@@ -118,7 +114,7 @@ public:
       } else {
         Serial.print("Thankyou. Remote IP is:");
         Serial.println(remoteNodeIP);
-        StorageManager::saveRemoteIPAddress(remoteNodeIP[0], remoteNodeIP[1], remoteNodeIP[2], remoteNodeIP[3]);
+        StorageManager::saveRemoteIPAddress(remoteNodeIP);
       }
     }
   }
