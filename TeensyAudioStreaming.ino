@@ -18,6 +18,8 @@ void setup() {
   displayManager.println("Setting up Audio...");
   audioManager.Setup();
   displayManager.println("Done!");
+  displayManager.println("RX:");
+  displayManager.println("TX:");
 }
 
 void loop() {
@@ -33,6 +35,9 @@ void handleLocalAudio(){
   // if there is an audio buffer send it to the other device
   if (hasLocalAudioBuffers){
     networkManager.sendAudioBuffers(inputAudioBufferLeft, inputAudioBufferRight);
+    displayManager.ShowDataSent();
+  } else {
+    displayManager.ShowNoDataSent();
   }
 }
 
@@ -41,5 +46,8 @@ void handleRemoteAudio(){
   byte outputAudioBufferRight[256];
   if (networkManager.receiveAudioBuffers(outputAudioBufferLeft, outputAudioBufferRight)){
     audioManager.setOutputAudioBuffers(outputAudioBufferLeft, outputAudioBufferRight);
+    displayManager.ShowDataReceived();
+  } else {
+    displayManager.ShowNoDataReceived();
   }
 }

@@ -56,10 +56,46 @@ public:
     tft.println(text);
   }
 
+  void ShowDataReceived(){
+    if (showingDataReceived == false){
+      showingDataReceived = true;
+      tft.fillRect(50, 100, 10, 10, ILI9341_GREEN);
+    }
+    noDataReceivedCounter = 0;
+  }
+
+  void ShowNoDataReceived(){
+    if (showingDataReceived == true && noDataReceivedCounter > 10000) {
+      showingDataReceived = false;
+      tft.fillRect(50, 100, 10, 10, ILI9341_BLACK);
+    }
+    noDataReceivedCounter++;
+  }
+
+  void ShowDataSent(){
+    if (showingDataSent == false) {
+      showingDataSent = true;
+      tft.fillRect(50, 125, 10, 10, ILI9341_GREEN);
+    }
+    noDataSentCounter = 0;
+  }
+
+  void ShowNoDataSent(){
+    // only show no data sent if there's been over 10000 cycles without data, stops screen flicker
+    if (showingDataSent == true && noDataSentCounter > 10000) {
+      showingDataSent = false;
+      tft.fillRect(50, 125, 10, 10, ILI9341_BLACK);
+    }
+    noDataSentCounter++;
+  }
+
 private:
   ILI9341_t3n tft = ILI9341_t3n(TFT_CS, TFT_DC, TFT_RST, TFT_MOSI, TFT_SCK, TFT_MISO);
   float p = 3.1415926;
-
+  bool showingDataSent = false;
+  bool showingDataReceived = false;
+  int noDataSentCounter = 0;
+  int noDataReceivedCounter = 0;
 };
 
 
