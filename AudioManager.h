@@ -74,6 +74,11 @@ public:
     memcpy(activeOutputBufferRight->getBuffer(), outputAudioBufferRight, 256);
     activeOutputBufferLeft->playBuffer();
     activeOutputBufferRight->playBuffer();
+
+    memcpy(outputBufferUSBLeft.getBuffer(), outputAudioBufferLeft, 256);
+    memcpy(outputBufferUSBRight.getBuffer(), outputAudioBufferRight, 256);
+    outputBufferUSBLeft.playBuffer();
+    outputBufferUSBRight.playBuffer();
     return true;
   }
 
