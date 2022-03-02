@@ -6,31 +6,84 @@
 #include <SPI.h>
 #include <SD.h>
 #include <SerialFlash.h>
+#include <Audio.h>
+#include <Wire.h>
+#include <SPI.h>
+#include <SD.h>
+#include <SerialFlash.h>
+
+#include <Audio.h>
+#include <Wire.h>
+#include <SPI.h>
+#include <SD.h>
+#include <SerialFlash.h>
+
+#include <Audio.h>
+#include <Wire.h>
+#include <SPI.h>
+#include <SD.h>
+#include <SerialFlash.h>
+
+#include <Audio.h>
+#include <Wire.h>
+#include <SPI.h>
+#include <SD.h>
+#include <SerialFlash.h>
+#include <Audio.h>
+#include <Wire.h>
+#include <SPI.h>
+#include <SD.h>
+#include <SerialFlash.h>
+
 
 // GUItool: begin automatically generated code
-AudioInputUSB            inputDeviceUSB; //xy=85.00003051757812,75.00000286102295
-AudioInputI2S            inputDeviceI2S;           //xy=88,247.00000667572021
-AudioRecordQueue         inputBufferI2SLeft;         //xy=284.00000762939453,214.0000057220459
-AudioRecordQueue         inputBufferI2SRight;         //xy=285,275
-AudioRecordQueue         inputBufferUSBRight; //xy=288.0000457763672,112.00000381469727
-AudioRecordQueue         inputBufferUSBLeft; //xy=291.0000457763672,47.000006675720215
-AudioPlayQueue           outputBufferUSBLeft;         //xy=478.00001525878906,47.000000953674316
-AudioPlayQueue           outputBufferUSBRight;         //xy=481.00001525878906,112.00000286102295
-AudioPlayQueue           outputBufferI2SLeft; //xy=485.00000762939453,212.00000667572021
-AudioPlayQueue           outputBufferI2SRight; //xy=486.0000534057617,275.00000762939453
-AudioOutputI2S           outputDeviceI2S; //xy=680.0000152587891,244.0000114440918
-AudioOutputUSB           outputDeviceUSB;           //xy=685.0000152587891,75.00000190734863
-AudioConnection          patchCord1(inputDeviceUSB, 0, inputBufferUSBLeft, 0);
-AudioConnection          patchCord2(inputDeviceUSB, 1, inputBufferUSBRight, 0);
-AudioConnection          patchCord3(inputDeviceI2S, 0, inputBufferI2SLeft, 0);
-AudioConnection          patchCord4(inputDeviceI2S, 1, inputBufferI2SRight, 0);
-AudioConnection          patchCord5(outputBufferUSBLeft, 0, outputDeviceUSB, 0);
-AudioConnection          patchCord6(outputBufferUSBRight, 0, outputDeviceUSB, 1);
-AudioConnection          patchCord7(outputBufferI2SLeft, 0, outputDeviceI2S, 0);
-AudioConnection          patchCord8(outputBufferI2SRight, 0, outputDeviceI2S, 1);
-AudioControlSGTL5000     sgtl5000_1;     //xy=267.00000762939453,369.0000057220459
+AudioPlayQueue           loopbackBufferI2SLeft;         //xy=1436.000144958496,239.8889274597168
+AudioPlayQueue           loopbackBufferUSBLeft;         //xy=1436.500144958496,200.3889274597168
+AudioPlayQueue           loopbackBufferI2SRight;         //xy=1436.000144958496,332.8889274597168
+AudioPlayQueue           loopbackBufferUSBRight;         //xy=1437.000144958496,293.8889274597168
+AudioInputI2S            inputDeviceI2S; //xy=1597.5555744171143,511.4443984031677
+AudioInputUSB            inputDeviceUSB; //xy=1600.111078262329,450.55551052093506
+AudioPlayQueue           outputBufferLeft; //xy=1645.0555534362793,25.750000953674316
+AudioPlayQueue           outputBufferRight; //xy=1650.4724502563477,62.25000762939453
+AudioMixer4              loopbackMixerLeft;         //xy=1673.000144958496,224.8889274597168
+AudioMixer4              loopbackMixerRight;         //xy=1676.000144958496,318.8889274597168
+AudioMixer4              inputMixerLeft;         //xy=1810.0000019073486,448.8888397216797
+AudioMixer4              inputMixerRight;         //xy=1813.3331966400146,531.1110668182373
+AudioRecordQueue         inputBufferLeft;         //xy=1992.222173690796,447.7777347564697
+AudioRecordQueue         inputBufferRight;         //xy=1996.6666778988308,531.1110649108887
+AudioMixer4              monitorMixerI2SLeft;         //xy=2010.000144958496,240.0000286102295
+AudioMixer4              monitorMixerUSBLeft;         //xy=2011.6667137145996,54.9444465637207
+AudioMixer4              monitorMixerUSBRight;         //xy=2014.9166831970215,139.19444465637207
+AudioMixer4              monitorMixerI2SRight;         //xy=2015.5556335449219,326.66669845581055
+AudioOutputUSB           outputDeviceUSB; //xy=2246.1666831970215,97.44444465637207
+AudioOutputI2S           outputDeviceI2S; //xy=2273.833122253418,281.80556869506836
+AudioConnection          patchCord1(loopbackBufferI2SLeft, 0, loopbackMixerLeft, 1);
+AudioConnection          patchCord2(loopbackBufferUSBLeft, 0, loopbackMixerLeft, 0);
+AudioConnection          patchCord3(loopbackBufferI2SRight, 0, loopbackMixerRight, 1);
+AudioConnection          patchCord4(loopbackBufferUSBRight, 0, loopbackMixerRight, 0);
+AudioConnection          patchCord5(inputDeviceI2S, 0, inputMixerLeft, 1);
+AudioConnection          patchCord6(inputDeviceI2S, 1, inputMixerRight, 1);
+AudioConnection          patchCord7(inputDeviceUSB, 0, inputMixerLeft, 0);
+AudioConnection          patchCord8(inputDeviceUSB, 1, inputMixerRight, 0);
+AudioConnection          patchCord9(outputBufferLeft, 0, monitorMixerUSBLeft, 0);
+AudioConnection          patchCord10(outputBufferLeft, 0, monitorMixerI2SLeft, 0);
+AudioConnection          patchCord11(outputBufferRight, 0, monitorMixerUSBRight, 0);
+AudioConnection          patchCord12(outputBufferRight, 0, monitorMixerI2SRight, 0);
+AudioConnection          patchCord13(loopbackMixerLeft, 0, monitorMixerUSBLeft, 1);
+AudioConnection          patchCord14(loopbackMixerLeft, 0, monitorMixerI2SLeft, 1);
+AudioConnection          patchCord15(loopbackMixerRight, 0, monitorMixerI2SRight, 1);
+AudioConnection          patchCord16(loopbackMixerRight, 0, monitorMixerUSBRight, 1);
+AudioConnection          patchCord17(inputMixerLeft, inputBufferLeft);
+AudioConnection          patchCord18(inputMixerRight, inputBufferRight);
+AudioConnection          patchCord19(monitorMixerI2SLeft, 0, outputDeviceI2S, 0);
+AudioConnection          patchCord20(monitorMixerUSBLeft, 0, outputDeviceUSB, 0);
+AudioConnection          patchCord21(monitorMixerUSBRight, 0, outputDeviceUSB, 1);
+AudioConnection          patchCord22(monitorMixerI2SRight, 0, outputDeviceI2S, 1);
+AudioControlSGTL5000     sgtl5000_1;     //xy=1833.2222385406494,586.7777557373047
 // GUItool: end automatically generated code
 
+
+// on monitor mixers, channel 0 is output, 1 loopback
 class AudioManager{
 
 public:
@@ -43,25 +96,18 @@ public:
     // max without clipping from headphone output is 0.7
     sgtl5000_1.volume(0.7);
     
-    activeInputBufferLeft = &inputBufferUSBLeft;
-    activeInputBufferRight = &inputBufferUSBRight;
-//    activeInputBufferLeft = &inputBufferI2SLeft;
-//    activeInputBufferRight = &inputBufferI2SRight;
-    
-    activeOutputBufferLeft = &outputBufferI2SLeft;
-    activeOutputBufferRight = &outputBufferI2SRight;
-    
     startInputBuffer();
+    
   }
   
-  bool getInputAudioBuffers(byte localAudioBufferLeft[256], byte localAudioBufferRight[256]){
-    if (activeInputBufferLeft->available() >= 1 && activeInputBufferRight->available() >= 1) {
+  bool getInputAudioBuffers(uint8_t localAudioBufferLeft[256], uint8_t localAudioBufferRight[256]){
+    if (inputBufferLeft.available() >= 1 && inputBufferRight.available() >= 1) {
       // Fetch 1 blocks from the audio library
-      memcpy(localAudioBufferLeft, activeInputBufferLeft->readBuffer(), 256);
-      activeInputBufferLeft->freeBuffer();
+      memcpy(localAudioBufferLeft, inputBufferLeft.readBuffer(), 256);
+      inputBufferLeft.freeBuffer();
       
-      memcpy(localAudioBufferRight, activeInputBufferRight->readBuffer(), 256);
-      activeInputBufferRight->freeBuffer();
+      memcpy(localAudioBufferRight, inputBufferRight.readBuffer(), 256);
+      inputBufferRight.freeBuffer();
 
       return true;
     } else {
@@ -69,48 +115,44 @@ public:
     }
   }
 
-  bool setOutputAudioBuffers(byte outputAudioBufferLeft[256], byte outputAudioBufferRight[256]){
-    memcpy(activeOutputBufferLeft->getBuffer(), outputAudioBufferLeft, 256);
-    memcpy(activeOutputBufferRight->getBuffer(), outputAudioBufferRight, 256);
-    activeOutputBufferLeft->playBuffer();
-    activeOutputBufferRight->playBuffer();
-
-    memcpy(outputBufferUSBLeft.getBuffer(), outputAudioBufferLeft, 256);
-    memcpy(outputBufferUSBRight.getBuffer(), outputAudioBufferRight, 256);
-    outputBufferUSBLeft.playBuffer();
-    outputBufferUSBRight.playBuffer();
+  bool setOutputAudioBuffers(uint8_t outputAudioBufferLeft[256], uint8_t outputAudioBufferRight[256]){
+    //  look at calling buffer.play(buffer, size) if there is performance gained
+    memcpy(outputBufferLeft.getBuffer(), outputAudioBufferLeft, 256);
+    memcpy(outputBufferRight.getBuffer(), outputAudioBufferRight, 256);
+    outputBufferLeft.playBuffer();
+    outputBufferRight.playBuffer();
+    
     return true;
   }
 
-private:
-  AudioRecordQueue* activeInputBufferLeft;
-  AudioRecordQueue* activeInputBufferRight;
-  AudioPlayQueue* activeOutputBufferLeft;
-  AudioPlayQueue* activeOutputBufferRight; 
+  void setPlaybackAudioBuffers(uint8_t loopbackAudioBufferLeft[256], uint8_t loopbackAudioBufferRight[256]){
+    memcpy(loopbackBufferUSBLeft.getBuffer(), loopbackAudioBufferLeft, 256);
+    memcpy(loopbackBufferUSBRight.getBuffer(), loopbackAudioBufferRight, 256);
+    loopbackBufferUSBLeft.playBuffer();
+    loopbackBufferUSBRight.playBuffer();
+  }
 
+  void setLoopbackGain(int gainValue) {
+    monitorMixerI2SLeft.gain(1, gainValue);
+    monitorMixerI2SRight.gain(1, gainValue);
+    monitorMixerUSBLeft.gain(1, gainValue);
+    monitorMixerUSBRight.gain(1, gainValue);
+  }
+
+  void enableLoopback() {
+    this->setLoopbackGain(1);
+  }
+
+  void disableLoopback() {
+    this->setLoopbackGain(0);
+  }
+
+private:
   void startInputBuffer(){
     Serial.println("Begin Buffer");
-    activeInputBufferLeft->begin();
-    activeInputBufferRight->begin();
+    inputBufferLeft.begin();
+    inputBufferRight.begin();
   }
-  
-//  void handleUSBVolume(){
-//    // read the PC's volume setting
-//    float vol = inputDeviceUSB.volume();
-//  
-//    // scale to a nice range (not too loud)
-//    // and adjust the audio shield output volume
-//    if (vol > 0) {
-//      // scale 0 = 1.0 range to:
-//      //  0.3 = almost silent
-//      //  0.8 = really loud
-//      vol = 0.3 + vol * 0.5;
-//    }
-//  
-//    // use the scaled volume setting.  Delete this for fixed volume.
-//    sgtl5000_1.volume(vol);
-//  }
-
 };
 
 #endif

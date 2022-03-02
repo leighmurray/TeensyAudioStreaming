@@ -38,7 +38,6 @@ public:
   void Setup(bool useJacktripHeader = false){
     this->useJacktripHeader = useJacktripHeader;
     // Print the MAC address
-
     Ethernet.macAddress(mac);
     Serial.printf("MAC = %02x:%02x:%02x:%02x:%02x:%02x\n", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
     
@@ -50,10 +49,10 @@ public:
     }
     if (!Ethernet.waitForLocalIP(kDHCPTimeout)) {
       Serial.println("Failed to get IP address from DHCP.");
-      SetupStaticIP();
+      this->SetupStaticIP();
     }
 
-    PrintIPData();
+    this->PrintIPData();
     
     // Listen on port
     udp.begin(kAudioPort);
@@ -82,38 +81,38 @@ public:
     while (!initialised) {
       IPAddress savedIP(StorageManager::getRemoteIPAddress());
       Serial.printf("Please give me the remote IP address or press enter to attempt %u.%u.%u.%u:\n", savedIP[0], savedIP[1], savedIP[2], savedIP[3]);
-      uint8_t count = 10;
+      uint8_t ipInputWaitCountdown = 10;
       Serial.print("Auto-reconnect in: ");
-      while(!Serial.available() && count > 0){
+      while(!Serial.available() && ipInputWaitCountdown > 0){
         if (udp.parsePacket()){
-          remoteNodeIP = udp.remoteIP();
+          this->remoteNodeIP = udp.remoteIP();
           Serial.print("Nevermind, we have incoming data from: ");
-          Serial.println(remoteNodeIP);
+          Serial.println(this->remoteNodeIP);
           StorageManager::saveRemoteIPAddress(uint32_t(remoteNodeIP));
           return;
         }
-        Serial.printf("%u, ", count);
+        Serial.printf("%u, ", ipInputWaitCountdown);
         delay(1000);
-        count--;
+        ipInputWaitCountdown--;
       }
       String ipString = Serial.readStringUntil('\n');
       if (!ipString.length()){
         Serial.print("Setting remote to: ");
-        remoteNodeIP = savedIP;
-        Serial.println(remoteNodeIP);
+        this->remoteNodeIP = savedIP;
+        Serial.println(this->remoteNodeIP);
         initialised = true;
         // returning so that we dont "waste" a write to the EEPROM because it's limited.
         return;
       } else {
         Serial.println(ipString);
-        initialised = remoteNodeIP.fromString(ipString);
+        initialised = this->remoteNodeIP.fromString(ipString);
       }
       
       if (!initialised){
         Serial.println("Invalid IP address.");
       } else {
         Serial.print("Thankyou. Remote IP is:");
-        Serial.println(remoteNodeIP);
+        Serial.println(this->remoteNodeIP);
         StorageManager::saveRemoteIPAddress(remoteNodeIP);
       }
     }
@@ -125,18 +124,18 @@ public:
     memcpy(&audioPacket[256], audioBufferRight, 256);
 
     if (useJacktripHeader == true){
-      jacktripDefaultHeader.TimeStamp = (uint64_t(now()) * 1000000) + (micros()); // this is microseconds since the program started so INCORRECT
+      this->jacktripDefaultHeader.TimeStamp = (uint64_t(now()) * 1000000) + (micros()); // this is microseconds since the program started so INCORRECT
       byte audioPacketWithHeader[528];
       // copy the header to the first 16 bytes
       memcpy(&audioPacketWithHeader[0], &jacktripDefaultHeader, sizeof(JacktripDefaultHeader));
       // copy the remaining audio data to the rest of the byte array
       memcpy(&audioPacketWithHeader[16], audioPacket, 512);
       // increase the sequence for the next header
-      jacktripDefaultHeader.SeqNumber++;
-      return udp.send(remoteNodeIP,  kAudioPort, audioPacketWithHeader, 528);
+      this->jacktripDefaultHeader.SeqNumber++;
+      return udp.send(this->remoteNodeIP,  kAudioPort, audioPacketWithHeader, 528);
     }
     else {
-      return udp.send(remoteNodeIP,  kAudioPort, audioPacket, 512);
+      return udp.send(this->remoteNodeIP,  kAudioPort, audioPacket, 512);
     }
   }
 
@@ -152,12 +151,28 @@ public:
     return false;
   }
 
+  String getLocalIPString() {
+    IPAddress ip = Ethernet.localIP();
+    return String(ip[0]) + '.' +
+        String(ip[1]) + '.' +
+        String(ip[2]) + '.' +
+        String(ip[3]);
+  }
+
+  String getRemoteIPString() {
+    return String(remoteNodeIP[0]) + '.' +
+        String(remoteNodeIP[1]) + '.' +
+        String(remoteNodeIP[2]) + '.' +
+        String(remoteNodeIP[3]);
+  }
+  
 
 private:
   bool isStaticIP = false;
   IPAddress remoteNodeIP;
   uint8_t mac[6];
   bool useJacktripHeader = false;
+  
   JacktripDefaultHeader jacktripDefaultHeader = {
     0,    //uint64_t TimeStamp;
     0,    //uint16_t SeqNumber;

@@ -9,17 +9,30 @@ DisplayManager displayManager;
 void handleRemoteAudio();
 void handleLocalAudio();
 
+#define LOOPBACK false
+
 void setup() {
   Serial.begin(115200);
   displayManager.Setup();
-  displayManager.println("Setting up Network...");
+  displayManager.print("Setup Network...\n");
   networkManager.Setup(true);
-  displayManager.println("Done!");
-  displayManager.println("Setting up Audio...");
+  displayManager.print("Done.\n");
+  displayManager.print("Setup Audio...\n");
   audioManager.Setup();
-  displayManager.println("Done!");
-  displayManager.println("RX:");
-  displayManager.println("TX:");
+  displayManager.print("Done.\n");
+  displayManager.clearScreen();
+  String localIPString = networkManager.getLocalIPString();
+  displayManager.print("Local IP:\n");
+  displayManager.print(localIPString);
+  String remoteIPString = networkManager.getRemoteIPString();
+  displayManager.print("\nRemote IP:\n");
+  displayManager.print(remoteIPString);
+  displayManager.print("\nTX:\n");
+  displayManager.print("RX:\n");
+
+  if (!LOOPBACK){
+    audioManager.disableLoopback();
+  }
 }
 
 void loop() {
@@ -28,13 +41,14 @@ void loop() {
 }
 
 void handleLocalAudio(){
-  byte inputAudioBufferLeft[256];
-  byte inputAudioBufferRight[256];
+  uint8_t inputAudioBufferLeft[256];
+  uint8_t inputAudioBufferRight[256];
   bool hasLocalAudioBuffers = audioManager.getInputAudioBuffers(inputAudioBufferLeft, inputAudioBufferRight);
-  
+ 
   // if there is an audio buffer send it to the other device
   if (hasLocalAudioBuffers){
     networkManager.sendAudioBuffers(inputAudioBufferLeft, inputAudioBufferRight);
+    audioManager.setPlaybackAudioBuffers(inputAudioBufferLeft, inputAudioBufferRight);
     displayManager.ShowDataSent();
   } else {
     displayManager.ShowNoDataSent();
@@ -42,8 +56,8 @@ void handleLocalAudio(){
 }
 
 void handleRemoteAudio(){
-  byte outputAudioBufferLeft[256];
-  byte outputAudioBufferRight[256];
+  uint8_t outputAudioBufferLeft[256];
+  uint8_t outputAudioBufferRight[256];
   if (networkManager.receiveAudioBuffers(outputAudioBufferLeft, outputAudioBufferRight)){
     audioManager.setOutputAudioBuffers(outputAudioBufferLeft, outputAudioBufferRight);
     displayManager.ShowDataReceived();
