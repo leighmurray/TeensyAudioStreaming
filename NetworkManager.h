@@ -118,14 +118,14 @@ public:
     }
   }
 
-  bool sendAudioBuffers(byte audioBufferLeft[256], byte audioBufferRight[256]){
-    byte audioPacket[512];
+  bool sendAudioBuffers(uint8_t audioBufferLeft[256], uint8_t audioBufferRight[256]){
+    uint8_t audioPacket[512];
     memcpy(audioPacket, audioBufferLeft, 256);
     memcpy(&audioPacket[256], audioBufferRight, 256);
 
     if (useJacktripHeader == true){
       this->jacktripDefaultHeader.TimeStamp = (uint64_t(now()) * 1000000) + (micros()); // this is microseconds since the program started so INCORRECT
-      byte audioPacketWithHeader[528];
+      uint8_t audioPacketWithHeader[528];
       // copy the header to the first 16 bytes
       memcpy(&audioPacketWithHeader[0], &jacktripDefaultHeader, sizeof(JacktripDefaultHeader));
       // copy the remaining audio data to the rest of the byte array
@@ -139,7 +139,7 @@ public:
     }
   }
 
-  bool receiveAudioBuffers(byte outputAudioBufferLeft[256], byte outputAudioBufferRight[256]){
+  bool receiveAudioBuffers(uint8_t outputAudioBufferLeft[256], uint8_t outputAudioBufferRight[256]){
     uint16_t size = udp.parsePacket();
     if (0 < size && size <= sizeof(buf)) {
       udp.read(buf, size);
