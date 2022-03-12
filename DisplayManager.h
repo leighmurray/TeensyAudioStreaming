@@ -128,7 +128,6 @@ private:
   CRGB matrixleds[mw*mh];;
   FastLED_SPITFT_GFX *matrix = new FastLED_SPITFT_GFX(matrixleds, mw, mh, 96, 64, display, rotation);
   
-  float p = 3.1415926;
   bool showingDataSent = false;
   bool showingDataReceived = false;
   int noDataSentCounter = 0;

@@ -9,10 +9,10 @@ DisplayManager displayManager;
 void handleRemoteAudio();
 void handleLocalAudio();
 
-#define LOOPBACK false
+#define LOOPBACK true
 
 void setup() {
-  Serial.begin(115200);
+  //Serial.begin(115200);
   displayManager.Setup();
   displayManager.print("Setup Network...\n");
   networkManager.Setup(true);
@@ -30,8 +30,12 @@ void setup() {
   displayManager.print("\nTX:\n");
   displayManager.print("RX:\n");
 
-  if (!LOOPBACK){
+  if (LOOPBACK == false){
+    displayManager.print("\nLoopback Disabled\n");
     audioManager.disableLoopback();
+  } else {
+    displayManager.print("\nLoopback Enabled\n");
+    audioManager.enableLoopback();
   }
 }
 
@@ -48,7 +52,6 @@ void handleLocalAudio(){
   // if there is an audio buffer send it to the other device
   if (hasLocalAudioBuffers){
     networkManager.sendAudioBuffers(inputAudioBufferLeft, inputAudioBufferRight);
-    audioManager.setPlaybackAudioBuffers(inputAudioBufferLeft, inputAudioBufferRight);
     displayManager.ShowDataSent();
   } else {
     displayManager.ShowNoDataSent();

@@ -6,80 +6,47 @@
 #include <SPI.h>
 #include <SD.h>
 #include <SerialFlash.h>
-#include <Audio.h>
-#include <Wire.h>
-#include <SPI.h>
-#include <SD.h>
-#include <SerialFlash.h>
-
-#include <Audio.h>
-#include <Wire.h>
-#include <SPI.h>
-#include <SD.h>
-#include <SerialFlash.h>
-
-#include <Audio.h>
-#include <Wire.h>
-#include <SPI.h>
-#include <SD.h>
-#include <SerialFlash.h>
-
-#include <Audio.h>
-#include <Wire.h>
-#include <SPI.h>
-#include <SD.h>
-#include <SerialFlash.h>
-#include <Audio.h>
-#include <Wire.h>
-#include <SPI.h>
-#include <SD.h>
-#include <SerialFlash.h>
-
 
 // GUItool: begin automatically generated code
-AudioPlayQueue           loopbackBufferI2SLeft;         //xy=1436.000144958496,239.8889274597168
-AudioPlayQueue           loopbackBufferUSBLeft;         //xy=1436.500144958496,200.3889274597168
-AudioPlayQueue           loopbackBufferI2SRight;         //xy=1436.000144958496,332.8889274597168
-AudioPlayQueue           loopbackBufferUSBRight;         //xy=1437.000144958496,293.8889274597168
-AudioInputI2S            inputDeviceI2S; //xy=1597.5555744171143,511.4443984031677
-AudioInputUSB            inputDeviceUSB; //xy=1600.111078262329,450.55551052093506
-AudioPlayQueue           outputBufferLeft; //xy=1645.0555534362793,25.750000953674316
-AudioPlayQueue           outputBufferRight; //xy=1650.4724502563477,62.25000762939453
-AudioMixer4              loopbackMixerLeft;         //xy=1673.000144958496,224.8889274597168
-AudioMixer4              loopbackMixerRight;         //xy=1676.000144958496,318.8889274597168
-AudioMixer4              inputMixerLeft;         //xy=1810.0000019073486,448.8888397216797
-AudioMixer4              inputMixerRight;         //xy=1813.3331966400146,531.1110668182373
-AudioRecordQueue         inputBufferLeft;         //xy=1992.222173690796,447.7777347564697
-AudioRecordQueue         inputBufferRight;         //xy=1996.6666778988308,531.1110649108887
-AudioMixer4              monitorMixerI2SLeft;         //xy=2010.000144958496,240.0000286102295
-AudioMixer4              monitorMixerUSBLeft;         //xy=2011.6667137145996,54.9444465637207
-AudioMixer4              monitorMixerUSBRight;         //xy=2014.9166831970215,139.19444465637207
-AudioMixer4              monitorMixerI2SRight;         //xy=2015.5556335449219,326.66669845581055
-AudioOutputUSB           outputDeviceUSB; //xy=2246.1666831970215,97.44444465637207
-AudioOutputI2S           outputDeviceI2S; //xy=2273.833122253418,281.80556869506836
-AudioConnection          patchCord1(loopbackBufferI2SLeft, 0, loopbackMixerLeft, 1);
-AudioConnection          patchCord2(loopbackBufferUSBLeft, 0, loopbackMixerLeft, 0);
-AudioConnection          patchCord3(loopbackBufferI2SRight, 0, loopbackMixerRight, 1);
-AudioConnection          patchCord4(loopbackBufferUSBRight, 0, loopbackMixerRight, 0);
-AudioConnection          patchCord5(inputDeviceI2S, 0, inputMixerLeft, 1);
-AudioConnection          patchCord6(inputDeviceI2S, 1, inputMixerRight, 1);
-AudioConnection          patchCord7(inputDeviceUSB, 0, inputMixerLeft, 0);
-AudioConnection          patchCord8(inputDeviceUSB, 1, inputMixerRight, 0);
+AudioInputI2S            inputDeviceI2S; //xy=352.0952377319336,372.5714702606201
+AudioInputUSB            inputDeviceUSB; //xy=356.5238265991211,285.85722398757935
+AudioPlayQueue           outputBufferLeft; //xy=628.6666564941406,68
+AudioPlayQueue           outputBufferRight; //xy=633.6666564941406,105
+AudioMixer4              inputMixerLeft; //xy=649.380989074707,488.14288330078125
+AudioMixer4              inputMixerRight; //xy=652.380989074707,571.1428833007812
+AudioMixer4              loopbackMixerLeft; //xy=656.6666564941406,267
+AudioMixer4              loopbackMixerRight; //xy=659.6666564941406,361
+AudioRecordQueue         inputBufferLeft; //xy=831.380989074707,487.14288330078125
+AudioRecordQueue         inputBufferRight; //xy=835.380989074707,571.1428833007812
+AudioMixer4              monitorMixerI2SLeft; //xy=993.6666564941406,283
+AudioMixer4              monitorMixerUSBLeft; //xy=994.6666564941406,97
+AudioMixer4              monitorMixerUSBRight; //xy=997.6666564941406,182
+AudioMixer4              monitorMixerI2SRight; //xy=998.6666564941406,369
+AudioOutputUSB           outputDeviceUSB; //xy=1229.6666564941406,140
+AudioOutputI2S           outputDeviceI2S; //xy=1256.6666564941406,324
+AudioConnection          patchCord1(inputDeviceI2S, 0, inputMixerLeft, 1);
+AudioConnection          patchCord2(inputDeviceI2S, 0, loopbackMixerLeft, 1);
+AudioConnection          patchCord3(inputDeviceI2S, 1, inputMixerRight, 1);
+AudioConnection          patchCord4(inputDeviceI2S, 1, loopbackMixerRight, 1);
+AudioConnection          patchCord5(inputDeviceUSB, 0, inputMixerLeft, 0);
+AudioConnection          patchCord6(inputDeviceUSB, 0, loopbackMixerLeft, 0);
+AudioConnection          patchCord7(inputDeviceUSB, 1, inputMixerRight, 0);
+AudioConnection          patchCord8(inputDeviceUSB, 1, loopbackMixerRight, 0);
 AudioConnection          patchCord9(outputBufferLeft, 0, monitorMixerUSBLeft, 0);
 AudioConnection          patchCord10(outputBufferLeft, 0, monitorMixerI2SLeft, 0);
 AudioConnection          patchCord11(outputBufferRight, 0, monitorMixerUSBRight, 0);
 AudioConnection          patchCord12(outputBufferRight, 0, monitorMixerI2SRight, 0);
-AudioConnection          patchCord13(loopbackMixerLeft, 0, monitorMixerUSBLeft, 1);
-AudioConnection          patchCord14(loopbackMixerLeft, 0, monitorMixerI2SLeft, 1);
-AudioConnection          patchCord15(loopbackMixerRight, 0, monitorMixerI2SRight, 1);
-AudioConnection          patchCord16(loopbackMixerRight, 0, monitorMixerUSBRight, 1);
-AudioConnection          patchCord17(inputMixerLeft, inputBufferLeft);
-AudioConnection          patchCord18(inputMixerRight, inputBufferRight);
+AudioConnection          patchCord13(inputMixerLeft, inputBufferLeft);
+AudioConnection          patchCord14(inputMixerRight, inputBufferRight);
+AudioConnection          patchCord15(loopbackMixerLeft, 0, monitorMixerUSBLeft, 1);
+AudioConnection          patchCord16(loopbackMixerLeft, 0, monitorMixerI2SLeft, 1);
+AudioConnection          patchCord17(loopbackMixerRight, 0, monitorMixerI2SRight, 1);
+AudioConnection          patchCord18(loopbackMixerRight, 0, monitorMixerUSBRight, 1);
 AudioConnection          patchCord19(monitorMixerI2SLeft, 0, outputDeviceI2S, 0);
 AudioConnection          patchCord20(monitorMixerUSBLeft, 0, outputDeviceUSB, 0);
 AudioConnection          patchCord21(monitorMixerUSBRight, 0, outputDeviceUSB, 1);
 AudioConnection          patchCord22(monitorMixerI2SRight, 0, outputDeviceI2S, 1);
-AudioControlSGTL5000     sgtl5000_1;     //xy=1833.2222385406494,586.7777557373047
+AudioControlSGTL5000     sgtl5000_1;     //xy=839.5238571166992,657.5715084075928
 // GUItool: end automatically generated code
 
 
@@ -123,13 +90,6 @@ public:
     outputBufferRight.playBuffer();
     
     return true;
-  }
-
-  void setPlaybackAudioBuffers(uint8_t loopbackAudioBufferLeft[256], uint8_t loopbackAudioBufferRight[256]){
-    memcpy(loopbackBufferUSBLeft.getBuffer(), loopbackAudioBufferLeft, 256);
-    memcpy(loopbackBufferUSBRight.getBuffer(), loopbackAudioBufferRight, 256);
-    loopbackBufferUSBLeft.playBuffer();
-    loopbackBufferUSBRight.playBuffer();
   }
 
   void setLoopbackGain(int gainValue) {
