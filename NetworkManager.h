@@ -1,4 +1,3 @@
-
 #ifndef NETWORK_MANAGER_H
 #define NETWORK_MANAGER_H
 
@@ -6,6 +5,7 @@
 #include <QNDNSClient.h>
 #include "StorageManager.h"
 #include <TimeLib.h>
+#include <Audio.h>
 
 using namespace qindesign::network;
 
@@ -23,6 +23,9 @@ uint8_t macAddressNoUSBHeader[6] = {0x04, 0xe9, 0xe5, 0x11, 0x22, 0x7c};
 uint8_t* serverMacAddress = macAddressNoUSBHeader;
 uint8_t* clientMacAddress = macAddressUSBHeader;
 
+constexpr uint16_t audioBufferSize = AUDIO_BLOCK_SAMPLES * 2;
+constexpr uint8_t numberOfChannels = 2;
+
 struct JacktripDefaultHeader{
   uint64_t TimeStamp;
   uint16_t SeqNumber;
@@ -31,6 +34,15 @@ struct JacktripDefaultHeader{
   uint8_t BitResolution;
   uint8_t NumIncomingChannelsFromNet;
   uint8_t NumOutgoingChannelsFromNet;
+};
+
+double JacktripSampleRates[] = {
+  22050.00,
+  32000.00,
+  44100.00,
+  48000.00,
+  88200.00,
+  96000.00
 };
 
 class NetworkManager{
@@ -56,7 +68,6 @@ public:
     
     // Listen on port
     udp.begin(kAudioPort);
-
 
     // start an mDNS service
     Serial.println("Starting mDNS...");
@@ -118,35 +129,37 @@ public:
     }
   }
 
-  bool sendAudioBuffers(uint8_t audioBufferLeft[256], uint8_t audioBufferRight[256]){
-    uint8_t audioPacket[512];
-    memcpy(audioPacket, audioBufferLeft, 256);
-    memcpy(&audioPacket[256], audioBufferRight, 256);
+  bool sendAudioBuffers(uint8_t audioBufferLeft[audioBufferSize], uint8_t audioBufferRight[audioBufferSize]){
+    uint8_t audioPacket[audioBufferSize * numberOfChannels];
+    memcpy(audioPacket, audioBufferLeft, audioBufferSize);
+    memcpy(&audioPacket[audioBufferSize], audioBufferRight, audioBufferSize);
 
     if (useJacktripHeader == true){
       this->jacktripDefaultHeader.TimeStamp = (uint64_t(now()) * 1000000) + (micros()); // this is microseconds since the program started so INCORRECT
-      uint8_t audioPacketWithHeader[528];
+      uint8_t audioPacketWithHeader[audioBufferSize * numberOfChannels + 16];
       // copy the header to the first 16 bytes
       memcpy(&audioPacketWithHeader[0], &jacktripDefaultHeader, sizeof(JacktripDefaultHeader));
       // copy the remaining audio data to the rest of the byte array
-      memcpy(&audioPacketWithHeader[16], audioPacket, 512);
+      memcpy(&audioPacketWithHeader[16], audioPacket, audioBufferSize * numberOfChannels);
       // increase the sequence for the next header
       this->jacktripDefaultHeader.SeqNumber++;
-      return udp.send(this->remoteNodeIP,  kAudioPort, audioPacketWithHeader, 528);
+      return udp.send(this->remoteNodeIP,  kAudioPort, audioPacketWithHeader, audioBufferSize * numberOfChannels + 16);
     }
     else {
-      return udp.send(this->remoteNodeIP,  kAudioPort, audioPacket, 512);
+      return udp.send(this->remoteNodeIP,  kAudioPort, audioPacket, audioBufferSize * numberOfChannels);
     }
   }
 
-  bool receiveAudioBuffers(uint8_t outputAudioBufferLeft[256], uint8_t outputAudioBufferRight[256]){
+  bool receiveAudioBuffers(uint8_t outputAudioBufferLeft[audioBufferSize], uint8_t outputAudioBufferRight[audioBufferSize]){
     uint16_t size = udp.parsePacket();
     if (0 < size && size <= sizeof(buf)) {
       udp.read(buf, size);
       int audioDataOffset = useJacktripHeader ? 16 : 0;
-      memcpy(outputAudioBufferLeft, &buf[audioDataOffset], 256);
-      memcpy(outputAudioBufferRight, &buf[256+audioDataOffset], 256);
+      memcpy(outputAudioBufferLeft, &buf[audioDataOffset], audioBufferSize);
+      memcpy(outputAudioBufferRight, &buf[audioBufferSize + audioDataOffset], audioBufferSize);
       return true;
+    } else if (size > sizeof(buf)){
+      Serial.println("The udp packet size is bigger than the buffer. Packet size: " + String(size) + " - buffer size: " + String(sizeof(buf)));
     }
     return false;
   }
@@ -176,8 +189,8 @@ private:
   JacktripDefaultHeader jacktripDefaultHeader = {
     0,    //uint64_t TimeStamp;
     0,    //uint16_t SeqNumber;
-    128,  //uint16_t BufferSize;
-    2,    //uint8_t SamplingRate;
+    AUDIO_BLOCK_SAMPLES,  //uint16_t BufferSize;
+    5,    //uint8_t SamplingRate;
     16,   //uint8_t BitResolution;
     2,    //uint8_t NumIncomingChannelsFromNet;
     0     //uint8_t NumOutgoingChannelsFromNet;
