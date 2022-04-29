@@ -54,17 +54,23 @@ AudioControlSGTL5000     sgtl5000_1;     //xy=839.5238571166992,657.571508407592
 class AudioManager{
 
 public:
-  void Setup(){
-    AudioMemory(1000);
+  void Setup(uint16_t maxOutputBufferCount = 32){
+    AudioMemory(1024);
     sgtl5000_1.enable();
 
     sgtl5000_1.inputSelect(AUDIO_INPUT_LINEIN);
     
     // max without clipping from headphone output is 0.7
-    sgtl5000_1.volume(0.7);
+    sgtl5000_1.volume(1.0);
+
+    // the output queues can only have one sample in the queue
+    outputBufferLeft.setMaxBuffers(maxOutputBufferCount);
+    outputBufferRight.setMaxBuffers(maxOutputBufferCount);
+    // the output queues will not wait, if there's no space in the queue, samples will be dropped.
+    outputBufferLeft.setBehaviour(AudioPlayQueue::NON_STALLING);
+    outputBufferRight.setBehaviour(AudioPlayQueue::NON_STALLING);
     
     startInputBuffer();
-    
   }
   
   bool getInputAudioBuffers(uint8_t localAudioBufferLeft[AUDIO_BLOCK_SAMPLES * 2], uint8_t localAudioBufferRight[AUDIO_BLOCK_SAMPLES * 2]){
